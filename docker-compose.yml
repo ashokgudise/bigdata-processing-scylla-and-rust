@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  scylla:
+    image: scylladb/scylla
+    ports:
+      - "9042:9042"
+    environment:
+      - SCYLLA_CLUSTER_NAME=scylladb-bigdata-demo
+      - SCYLLA_DC=dc1
+      - SCYLLA_LISTEN_ADDRESS=0.0.0.0
+      - SCYLLA_RPC_ADDRESS=0.0.0.0
+
+  data-producer:
+      image: ashok-demos/scylla-db-rust-producer 
+      depends_on:
+        - scylla
+      environment:
+        - SCYLLA_CONTACT_POINTS=scylla
+
+  data-processor:
+    image: ashok-demos/scylla-db-rust-processor 
+    depends_on:
+      - scylla
+    environment:
+      - SCYLLA_CONTACT_POINTS=scylla
+
+  data-analyzer:
+    image: ashok-demos/scylla-db-rust-analyzer
+    depends_on:
+     - scylla
+    environment:
+      - SCYLLA_CONTACT_POINTS=scylla
